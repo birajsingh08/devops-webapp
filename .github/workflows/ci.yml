@@ -36,3 +36,23 @@ jobs:
           echo "CI Pipeline completed successfully."
           echo "Build timestamp:"
           date
+
+      - name: Send success notification to Slack
+        if: success()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST \
+            -H 'Content-type: application/json' \
+            --data '{"text":"✅ CI/CD SUCCESS: devops-webapp build completed successfully."}' \
+            "$SLACK_WEBHOOK_URL"
+
+      - name: Send failure notification to Slack
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST \
+            -H 'Content-type: application/json' \
+            --data '{"text":"❌ CI/CD FAILURE: devops-webapp build failed."}' \
+            "$SLACK_WEBHOOK_URL"
